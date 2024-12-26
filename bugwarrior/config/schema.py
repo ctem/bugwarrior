@@ -65,6 +65,14 @@ class ConfigList(frozenset):
             return value
 
 
+class ConfigDict(ConfigList):
+
+    @classmethod
+    def validate(cls, value):
+        items = super().validate(value)
+        return dict(item.split("=") for item in items)
+
+
 # HACK https://stackoverflow.com/a/34116756
 class ExpandedPath(type(pathlib.Path())):  # type: ignore
 

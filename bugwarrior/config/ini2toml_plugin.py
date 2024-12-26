@@ -6,6 +6,7 @@ from ini2toml.types import IntermediateRepr, Translator
 import pydantic.v1
 from pydantic.v1 import BaseModel
 
+from .schema import ConfigDict
 from .schema import ConfigList
 from ..services.activecollab2 import ActiveCollabProjects
 
@@ -92,6 +93,10 @@ class BooleanModel(BaseModel):
 
 def to_bool(section: IntermediateRepr, key: str):
     to_type(section, key, lambda val: BooleanModel(bool_value=val).bool_value)
+
+
+def to_dict(section: IntermediateRepr, key: str):
+    to_type(section, key, ConfigDict.validate)
 
 
 def to_int(section: IntermediateRepr, key: str):

@@ -55,6 +55,14 @@ class TestConfigList(unittest.TestCase):
         )
 
 
+class TestConfigDict(unittest.TestCase):
+    def test_configdict(self):
+        self.assertEqual(
+            schema.ConfigDict.validate('A=foo,B=bar,C=baz'),
+            {'A': 'foo', 'B': 'bar', 'C': 'baz'}
+        )
+
+
 class TestValidation(ConfigTest):
     def setUp(self):
         super().setUp()

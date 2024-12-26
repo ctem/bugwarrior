@@ -4,7 +4,8 @@ Config API
 """
 from .data import BugwarriorData
 from .load import BUGWARRIORRC, get_config_path, load_config  # noqa: F401
-from .schema import (ConfigList,  # noqa: F401
+from .schema import (ConfigDict,  # noqa: F401
+                     ConfigList,  # noqa: F401
                      ExpandedPath,  # noqa: F401
                      LoggingPath,  # noqa: F401
                      MainSectionConfig,

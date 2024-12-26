@@ -97,6 +97,13 @@ Priority mapping
 Logseq task priorities ``A``, ``B``, and ``C`` are mapped to the taskwarrior priorities
 ``H``, ``M``, and ``L`` respectively.
 
+You can override this default behaviour to use alternative custom mappings by setting the ``priority_map`` option.
+
+.. config::
+    :fragment: logseq
+
+    logseq.priority_map = A=H, B=M, C=L
+
 Character replacement
 +++++++++++++++++++++
 

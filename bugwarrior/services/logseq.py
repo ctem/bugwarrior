@@ -21,6 +21,14 @@ class LogseqConfig(config.ServiceConfig):
         "DOING", "TODO", "NOW", "LATER", "IN-PROGRESS", "WAIT", "WAITING"
         # states DONE and CANCELED/CANCELLED are skipped by default
     ]
+
+    # map default priorities (logseq: A B C; taskwarrior: H M L)
+    priority_map: config.ConfigDict = {
+        "A": "H",
+        "B": "M",
+        "C": "L"
+    }
+
     char_open_link: str = "【"
     char_close_link: str = "】"
     char_open_bracket: str = "〈"
@@ -123,13 +131,6 @@ class LogseqIssue(Issue):
     }
 
     UNIQUE_KEY = (ID, UUID)
-
-    # map A B C priority to H M L
-    PRIORITY_MAP = {
-        "A": "H",
-        "B": "M",
-        "C": "L",
-    }
 
     # `pending` is the defuault state. Taskwarrior will dynamcily change task to `waiting`
     # state if wait date is set to a future date.
@@ -256,9 +257,11 @@ class LogseqIssue(Issue):
         return {
             "project": self.extra["graph"],
             "priority": (
-                self.PRIORITY_MAP[self.record["priority"]]
+                self.priority_map.get(self.record["priority"])
                 if "priority" in self.record
-                else None
+                # default to an empty string to accommodate a blank in the
+                # priority uda, e.g., "H,M,,L"
+                else ""
             ),
             "annotations": annotations,
             "tags": self.get_tags_from_content(),
