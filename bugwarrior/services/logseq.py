@@ -256,9 +256,9 @@ class LogseqIssue(Issue):
         return {
             "project": self.extra["graph"],
             "priority": (
-                self.PRIORITY_MAP[self.record["priority"]]
-                if "priority" in self.record
-                else None
+                # default to an empty string to accommodate a blank in the
+                # priority uda, e.g., "H,M,,L"
+                self.PRIORITY_MAP.get(self.record.get("priority"), "")
             ),
             "annotations": annotations,
             "tags": self.get_tags_from_content(),
