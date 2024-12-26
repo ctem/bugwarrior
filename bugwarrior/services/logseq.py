@@ -257,11 +257,12 @@ class LogseqIssue(Issue):
         return {
             "project": self.extra["graph"],
             "priority": (
-                self.priority_map.get(self.record["priority"])
-                if "priority" in self.record
-                # default to an empty string to accommodate a blank in the
-                # priority uda, e.g., "H,M,,L"
-                else ""
+                # default to special string "_empty"; to accommodate blanks in
+                # priority UDA values (e.g., "H,M,,L"), defaulting to an empty
+                # string would be ideal, but taskw currently converts empty
+                # strings back to None and throws `ValueError: 'None' is not a
+                # valid choice`
+                self.priority_map.get(self.record.get("priority"), "_empty")
             ),
             "annotations": annotations,
             "tags": self.get_tags_from_content(),
