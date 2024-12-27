@@ -69,8 +69,17 @@ class ConfigDict(ConfigList):
 
     @classmethod
     def validate(cls, value):
+        print("ConfigDict value:", value)
+
+        # If it's already a dictionary, return it directly
+        if isinstance(value, dict):
+            print("ConfigDict value is dict")
+            return value
+
         items = super().validate(value)
-        return dict(item.split("=") for item in items)
+        print("ConfigDict items:", items)
+
+        return dict(item.split("=") for item in items if '=' in item)
 
 
 # HACK https://stackoverflow.com/a/34116756

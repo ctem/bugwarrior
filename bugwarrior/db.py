@@ -70,6 +70,7 @@ def make_unique_identifier(keys: dict, issue: dict) -> str:
     This is not the same as the taskwarrior uuid, which is assigned
     only once the task is created.
     """
+    print("!! db::Issue type:", type(issue))  # TEMP: Debugging line
     for service, key_list in keys.items():
         if all([key in issue for key in key_list]):
             subset = {key: issue[key] for key in key_list}

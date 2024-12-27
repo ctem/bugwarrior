@@ -132,6 +132,13 @@ class LogseqIssue(Issue):
 
     UNIQUE_KEY = (ID, UUID)
 
+    # map A B C priority to H M L
+    # PRIORITY_MAP = {
+    #     "A": "H",
+    #     "B": "M",
+    #     "C": "L",
+    # }
+
     # `pending` is the defuault state. Taskwarrior will dynamcily change task to `waiting`
     # state if wait date is set to a future date.
     STATE_MAP = {
@@ -254,15 +261,44 @@ class LogseqIssue(Issue):
     def to_taskwarrior(self):
         annotations, scheduled_date, deadline_date = self.get_annotations_from_content()
         wait_date = min([d for d in [scheduled_date, deadline_date, self.SOMEDAY] if d is not None])
+
+        # Ensure that priority_map is validated correctly
+        # self.config.priority_map = config.ConfigDict(self.config.priority_map)
+
+        print("!! Logseq record (ENTIRE DICT):", self.record)
+        print("!! Logseq priority:", self.record.get("priority", "_empty"))
+        # print("!! Priority map (CONST):", self.PRIORITY_MAP)
+        print("!! Type of priority_map:", type(self.config.priority_map))
+        print("!! Priority map (VAR):", self.config.priority_map)
+        print(
+            "!! Priority value:",
+            self.config.priority_map.get(
+                self.record.get("priority", "_empty"),
+                "EMPTY_STRING"
+            ),
+        )
+
         return {
             "project": self.extra["graph"],
+            # 'priority': self.config.default_priority,
             "priority": (
                 # default to special string "_empty"; to accommodate blanks in
                 # priority UDA values (e.g., "H,M,,L"), defaulting to an empty
                 # string would be ideal, but taskw currently converts empty
                 # strings back to None and throws `ValueError: 'None' is not a
                 # valid choice`
-                self.priority_map.get(self.record.get("priority"), "_empty")
+                self.config.priority_map.get(
+                    self.record.get("priority", "_empty"),
+                    # default to an empty string to accommodate blanks in
+                    # priority UDAs (e.g., "H,M,,L")
+                    ""  # "EMPTY_STRING"
+                )
+
+                # self.PRIORITY_MAP[self.record["priority"]]
+                # if "priority" in self.record
+                # # default to an empty string to accommodate a blank in the
+                # # priority uda, e.g., "H,M,,L"
+                # else ""
             ),
             "annotations": annotations,
             "tags": self.get_tags_from_content(),
