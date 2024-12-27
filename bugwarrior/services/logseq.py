@@ -207,16 +207,19 @@ class LogseqIssue(Issue):
         annotations = []
         scheduled_date = None
         deadline_date = None
+        project_property = None
         for line in self.record["content"].split("\n"):
             # handle special annotations
             if line.startswith("SCHEDULED: "):
                 scheduled_date = self.get_scheduled_date(line)
             elif line.startswith("DEADLINE: "):
                 deadline_date = self.get_scheduled_date(line)
+            elif line.startswith("project:: "):
+                project_property = line.replace("project:: ", "").strip()
             else:
                 annotations.append(self._unescape_content(line))
         annotations.pop(0)  # remove first line
-        return annotations, scheduled_date, deadline_date
+        return annotations, scheduled_date, deadline_date, project_property
 
     def get_url(self):
         return f'logseq://graph/{self.extra["graph"]}?block-id={self.record["uuid"]}'
@@ -259,36 +262,39 @@ class LogseqIssue(Issue):
         return self.get_logseq_state() in ["WAIT", "WAITING"]
 
     def to_taskwarrior(self):
-        annotations, scheduled_date, deadline_date = self.get_annotations_from_content()
+        annotations, scheduled_date, deadline_date, project_property = self.get_annotations_from_content()
         wait_date = min([d for d in [scheduled_date, deadline_date, self.SOMEDAY] if d is not None])
 
-        # Ensure that priority_map is validated correctly
-        # self.config.priority_map = config.ConfigDict(self.config.priority_map)
+        if project_property:
+            project_name = project_property
+        else:
+            project_name = self.extra["graph"]
 
         print("!! Logseq record (ENTIRE DICT):", self.record)
-        print("!! Logseq priority:", self.record.get("priority", "_empty"))
+        print("!! Logseq priority:", self.record.get("priority", "_undefined"))
         # print("!! Priority map (CONST):", self.PRIORITY_MAP)
         print("!! Type of priority_map:", type(self.config.priority_map))
         print("!! Priority map (VAR):", self.config.priority_map)
         print(
             "!! Priority value:",
             self.config.priority_map.get(
-                self.record.get("priority", "_empty"),
+                self.record.get("priority", "_undefined"),
                 "EMPTY_STRING"
             ),
         )
 
         return {
-            "project": self.extra["graph"],
+            # "project": self.extra["graph"],
+            "project": project_name,
             # 'priority': self.config.default_priority,
             "priority": (
-                # default to special string "_empty"; to accommodate blanks in
-                # priority UDA values (e.g., "H,M,,L"), defaulting to an empty
-                # string would be ideal, but taskw currently converts empty
-                # strings back to None and throws `ValueError: 'None' is not a
-                # valid choice`
+                # default to special string "_undefined"; to accommodate blanks
+                # in priority UDA values (e.g., "H,M,,L"), defaulting to an
+                # empty string would be ideal, but taskw currently converts
+                # empty strings back to None and throws `ValueError: 'None' is
+                # not a valid choice`
                 self.config.priority_map.get(
-                    self.record.get("priority", "_empty"),
+                    self.record.get("priority", "_undefined"),
                     # default to an empty string to accommodate blanks in
                     # priority UDAs (e.g., "H,M,,L")
                     ""  # "EMPTY_STRING"
