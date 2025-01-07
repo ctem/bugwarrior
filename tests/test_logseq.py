@@ -67,7 +67,7 @@ class TestLogseqIssue(AbstractServiceTest, ServiceTest):
             issue.ID: int(self.test_record["id"]),
             issue.UUID: self.test_record["uuid"],
             issue.STATE: self.test_record["marker"],
-            issue.TITLE: "DOING Do something",
+            issue.TITLE: "Do something",
             issue.URI: "logseq://graph/Test?block-id=66699a83-3ee0-4edc-81c6-a24c9b80bec6",
         }
 
@@ -83,7 +83,7 @@ class TestLogseqIssue(AbstractServiceTest, ServiceTest):
         expected = {
             "annotations": [],
             "description": f"(bw)Is#{self.test_record['id']}"
-            + " - DOING Do something"
+            + " - Do something"
             + " .. logseq://graph/Test?block-id=66699a83-3ee0-4edc-81c6-a24c9b80bec6",
             "due": None,
             "scheduled": None,
@@ -95,7 +95,7 @@ class TestLogseqIssue(AbstractServiceTest, ServiceTest):
             issue.ID: int(self.test_record["id"]),
             issue.UUID: self.test_record["uuid"],
             issue.STATE: self.test_record["marker"],
-            issue.TITLE: "DOING Do something",
+            issue.TITLE: "Do something",
             issue.URI: "logseq://graph/Test?block-id=66699a83-3ee0-4edc-81c6-a24c9b80bec6",
         }
 
