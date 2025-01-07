@@ -194,13 +194,19 @@ class LogseqIssue(Issue):
             r"(#[^" + self.config.char_open_link + r"^\s]+)",
             self.get_formatted_title()
         )
-        # and this adds the #[[multi word]] formatted tags
+        print("!! tags 1:", tags)
+        # and this adds the #[[multi word]] formatted tags (non-greedily)
         tags.extend(re.findall(
-            r"(#[" + self.config.char_open_link + r"].*[" + self.config.char_close_link + r"])",
+            r"(#[" + self.config.char_open_link + r"].*?[" + self.config.char_close_link + r"])",
             self.get_formatted_title()
         ))
-        # compress format to single words and strip prepending `#`
+        print("!! tags 2:", tags)
+        tags_try1 = [self._compress_tag_format(t) for t in tags]
+        print("!! tags 3:", tags_try1)
+        # compress format to single words and strip leading `#`
         tags = [self._compress_tag_format(t).lstrip('#') for t in tags]
+        print("!! tags 4:", tags)
+
         return tags
 
     # get a list of annotations from the content
@@ -283,6 +289,8 @@ class LogseqIssue(Issue):
                 "EMPTY_STRING"
             ),
         )
+
+        print("!! get_tags_from_content:", self.get_tags_from_content())
 
         return {
             # "project": self.extra["graph"],

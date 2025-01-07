@@ -116,6 +116,7 @@ class TaskConstructor:
         for tag in self.issue.config.add_tags:
             tag = Template(tag).render(self.get_template_context())
             if tag:
+                print("!! get_added_tags appending tag:", tag)
                 added_tags.append(tag)
 
         return added_tags
